@@ -1,0 +1,157 @@
+<mujoco model="h9_R">
+  <option gravity="0 0 -9.81"/>
+  <compiler angle="radian" meshdir="./assets" autolimits="true"/>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.831 0.831 0.831" rgb2="0.9 0.9 0.9" width="512" height="3072"/>
+    <material name="black" rgba="0.3 0.3 0.3 1"/>
+    <material name="black_transparent" rgba="0.3 0.3 0.3 0.5"/>
+    <material name="silver_transparent" rgba="1.5 1.5 1.5 0.5"/>
+	<material name="transparent" rgba="0 0 0 0"/>
+    <material name="grey" rgba="0.5 0.5 0.5 1"/>
+    <material name="white" rgba="2 2 2 2"/>
+    <material name="silver" rgba="1.3 1.3 1.3 1"/>
+    <material name="green" rgba="0 1 0 1"/>
+    
+    <mesh name="base_R_mesh" file="base_R.STL"/>
+    <mesh name="finger_1_mesh" file="finger_1.STL"/>
+	<mesh name="finger_2_mesh" file="finger_2.STL"/>
+	<mesh name="thumb_1_R_mesh" file="thumb_R_1.STL"/>
+	<mesh name="thumb_2_mesh" file="thumb_2.STL"/>
+	<mesh name="thumb_3_mesh" file="thumb_3.STL"/>
+
+  </asset>
+
+  <default>
+	<default class="h9_R">
+		<joint damping="0.1" frictionloss="0.05"/>
+		<position kp="1"/>
+		<default class="visual">
+			<geom type="mesh" contype="0" conaffinity="0" group="2"/>
+			<default class="base_R_visual">
+				<geom mesh="base_R_mesh" material="black"/>
+			</default>
+			<default class="finger_1_visual">
+				<geom mesh="finger_1_mesh" material="black"/>
+			</default>
+			<default class="finger_2_visual">
+				<geom mesh="finger_2_mesh" material="black"/>
+			</default>
+			<default class="thumb_1_R_visual">
+				<geom mesh="thumb_1_R_mesh" material="black"/>
+			</default>
+			<default class="thumb_2_visual">
+				<geom mesh="thumb_2_mesh" material="black"/>
+			</default>
+			<default class="thumb_3_visual">
+				<geom mesh="thumb_3_mesh" material="black"/>
+			</default>
+		</default>
+    </default>
+
+	<default class="collision">
+		<geom group="3" contype="1" conaffinity="1" rgba="0 1 0 1"/>
+	</default>
+  </default>
+  
+  <worldbody>
+    <body name="base" childclass="h9_R" pos="0 0 0">
+      <inertial pos="0.00040462 -0.00338958 0.05274590" mass="0.5" fullinertia="0.00027563 0.00021892 0.00010237 0.00000356 -0.00000022 -0.00001408"/>
+	  <geom class="collision" type="box" pos="0.022 0 0.06" size="0.0005 0.042 0.016"/>
+	  <geom class="collision" type="box" pos="0.022 -0.023 0.025" size="0.0005 0.015 0.018"/>
+      <geom class="base_R_visual"/>
+	  
+	  <body name="finger1" pos="0.0013 0.013 0.0214" quat="0.08715574 0 0 0.99619470">
+		<inertial pos="-0.00002194 -0.01217167 -0.00042063" mass="0.00494385" fullinertia="0.00000074 0.00000052 0.00000065 0 0 -0.00000002"/>
+		<joint name="finger1" pos="0 0 0" type="hinge" axis="0 0 -1" damping="0.005" frictionloss="0.001"/>
+		<geom class="thumb_1_R_visual"/>
+		<body name="finger2" pos="0 -0.028 -0.00135">
+			<inertial pos="0.00017250 -0.01864692 0.00001457" mass="0.00603964" fullinertia="0.00000147 0.00000034 0.00000154 -0.00000002 0 0"/>
+			<joint name="finger2" pos="0 0 0" type="hinge" axis="-1 0 0" damping="0.005" frictionloss="0.001"/>
+			<geom class="thumb_2_visual"/>
+			<geom class="collision" type="capsule" size="0.009" fromto="0 0 0 0 -0.042 0"/>
+			<body name="finger3" pos="0 -0.042 0">
+				<inertial pos="-0.00006264 -0.01905009 0.00008436" mass="0.00761841" fullinertia="0.00000143 0.00000032 0.00000144 0.00000001 0 -0.00000002"/>
+				<joint name="finger3" pos="0 0 0" type="hinge" axis="-1 0 0" damping="0.005" frictionloss="0.001"/>
+				<geom class="thumb_3_visual"/>
+				<geom class="collision" type="capsule" size="0.009" fromto="0 0 0 0 -0.030 0"/>
+			</body>
+		</body>	
+	  </body>
+
+	  <body name="finger4" pos="0.0018 0.02906 0.08838" quat="0.99904822 -0.04361939 0 0">
+		<inertial pos="0.00001457 -0.00017250 0.01864692" mass="0.00603964" fullinertia="0.00000154 0.00000147 0.00000034 0 0 -0.00000002"/>
+		<joint name="finger4" pos="0 0 0" type="hinge" axis="0 1 0" damping="0.005" frictionloss="0.001"/>
+		<geom class="finger_1_visual"/>
+		<geom class="collision" type="capsule" size="0.009" fromto="0 0 0 0 0 0.042"/>
+		<body name="finger5" pos="0 0 0.042">
+				<inertial pos="0.00008436 0.00006264 0.01905009" mass="0.00761841" fullinertia="0.00000144 0.00000143 0.00000032 0 0.00000002 0.00000001"/>
+				<joint name="finger5" pos="0 0 0" type="hinge" axis="0 1 0" damping="0.005" frictionloss="0.001"/>
+				<geom class="finger_2_visual"/>
+				<geom class="collision" type="capsule" size="0.009" fromto="0 0 0 0 0 0.030"/>
+			</body>
+	  </body>
+
+	  <body name="finger6" pos="0.0018 0 0.08921">
+		<inertial pos="0.00001457 -0.00017250 0.01864692" mass="0.00603964" fullinertia="0.00000154 0.00000147 0.00000034 0 0 -0.00000002"/>
+		<joint name="finger6" pos="0 0 0" type="hinge" axis="0 1 0" damping="0.005" frictionloss="0.001"/>
+		<geom class="finger_1_visual"/>
+		<geom class="collision" type="capsule" size="0.009" fromto="0 0 0 0 0 0.042"/>
+		<body name="finger7" pos="0 0 0.042">
+				<inertial pos="0.00008436 0.00006264 0.01905009" mass="0.00761841" fullinertia="0.00000144 0.00000143 0.00000032 0 0.00000002 0.00000001"/>
+				<joint name="finger7" pos="0 0 0" type="hinge" axis="0 1 0" damping="0.005" frictionloss="0.001"/>
+				<geom class="finger_2_visual"/>
+				<geom class="collision" type="capsule" size="0.009" fromto="0 0 0 0 0 0.030"/>
+			</body>
+	  </body>
+
+	   <body name="finger8" pos="0.0018 -0.02906 0.08838" quat="0.99904822 0.04361939 0 0">
+		<inertial pos="0.00001457 -0.00017250 0.01864692" mass="0.00603964" fullinertia="0.00000154 0.00000147 0.00000034 0 0 -0.00000002"/>
+		<joint name="finger8" pos="0 0 0" type="hinge" axis="0 1 0" damping="0.005" frictionloss="0.001"/>
+		<geom class="finger_1_visual"/>
+		<geom class="collision" type="capsule" size="0.009" fromto="0 0 0 0 0 0.042"/>
+		<body name="finger9" pos="0 0 0.042">
+				<inertial pos="0.00008436 0.00006264 0.01905009" mass="0.00761841" fullinertia="0.00000144 0.00000143 0.00000032 0 0.00000002 0.00000001"/>
+				<joint name="finger9" pos="0 0 0" type="hinge" axis="0 1 0" damping="0.005" frictionloss="0.001"/>
+				<geom class="finger_2_visual"/>
+				<geom class="collision" type="capsule" size="0.009" fromto="0 0 0 0 0 0.030"/>
+			</body>
+	  </body>
+
+    </body>
+  </worldbody>
+  
+  <actuator>
+    <motor name="motor1" joint="finger1"/>
+    <motor name="motor2" joint="finger2"/>
+    <motor name="motor3" joint="finger3"/>
+    <motor name="motor4" joint="finger4"/>
+    <motor name="motor5" joint="finger5"/>
+    <motor name="motor6" joint="finger6"/>
+    <motor name="motor7" joint="finger7"/>
+    <motor name="motor8" joint="finger8"/>
+    <motor name="motor9" joint="finger9"/>
+  </actuator>
+
+  <sensor>
+    <jointpos joint="finger1"/>
+    <jointpos joint="finger2"/>
+    <jointpos joint="finger3"/>
+    <jointpos joint="finger4"/>
+    <jointpos joint="finger5"/>
+    <jointpos joint="finger6"/>
+    <jointpos joint="finger7"/>
+    <jointpos joint="finger8"/>
+    <jointpos joint="finger9"/>
+    <jointvel joint="finger1"/>
+    <jointvel joint="finger2"/>
+    <jointvel joint="finger3"/>
+    <jointvel joint="finger4"/>
+    <jointvel joint="finger5"/>
+    <jointvel joint="finger6"/>
+    <jointvel joint="finger7"/>
+    <jointvel joint="finger8"/>
+    <jointvel joint="finger9"/>
+  </sensor>
+  
+</mujoco>
