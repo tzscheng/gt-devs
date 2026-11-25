@@ -6,7 +6,9 @@ __pycache__/
 *.map
 /hand-1/runner
 /hand-1/monitor
-/hand-1/manus
+/hand-1/manus/manus
+/hand-1/manus/manus-sim
+/hand-1/manus/log.txt
 /hand-1/*-sim
 /hand-1/log.txt
 /hand-2/Debug/

@@ -9,31 +9,30 @@
  *   glove --(Manus SDK)--> manus --(UDP "jointpos d1 ... d9")--> runner --(CAN)--> hand
  *
  * Build:
- *   see build.sh (the Manus SDK is in ./manus-sdk)
+ *   see build.sh (the Manus SDK is in ./include and ./lib)
  *   g++ -O2 -std=c++17 -W -Wall -DMANUS_SIM -o manus-sim manus.cpp -pthread
  *        (no glove, no SDK: a synthetic open/close motion; for testing with
  *         runner-sim)
  *
  * Run (after the runners are started):
- *   ./manus [-l <port>] [-r <port>] [-a <ip>] [-d <calib dir>] [-n] [-v]
+ *   ./manus [-l <port>] [-r <port>] [-a <ip>] [-d <calib dir>] [-v]
  *
  *   -l  UDP command port of the LEFT  hand runner, 0 = do not send (default 10000)
  *   -r  UDP command port of the RIGHT hand runner, 0 = do not send (default 10001)
  *   -a  IP address of the runners                                (default 127.0.0.1)
- *   -d  directory of the glove calibration files (.mcal)         (default calib)
- *   -n  do not load the calibration files (use the SDK defaults)
- *   -v  verbose: print every message sent
+ *   -d  load glove calibration files (.mcal) from the given directory
+ *   -v  verbose: print outgoing jointpos commands (deg)
  *
  *   e.g.  ./runner L2 -p 10000 -c 0 &
  *         ./runner R2 -p 10001 -c 1 &
- *         ./manus
+ *         ./manus/manus
  *
  * The glove pose is sent as it is, SEND_HZ times per second, from the first
  * glove data on: there is no start-up motion, so the hand moves quickly to the
  * glove pose when the first command arrives. If the glove data stops (glove
  * off, out of range) nothing is sent and the runner holds the last pose.
  * On exit (Ctrl-C) nothing more is sent: the hand holds its last pose. Send
- * "zero" / "quit" to the runner (runner-test) to move it back / stop it.
+ * "zero" / "quit" to the runner (console) to move it back / stop it.
  */
 #ifndef MANUS_SIM
 #include "ManusSDK.h"
@@ -248,13 +247,12 @@ bool InitSdk()
 void Usage(const char* prog)
 {
     std::fprintf(stderr,
-        "usage: %s [-l <port>] [-r <port>] [-a <ip>] [-d <calib dir>] [-n] [-v]\n"
+        "usage: %s [-l <port>] [-r <port>] [-a <ip>] [-d <calib dir>] [-v]\n"
         "  -l  UDP command port of the LEFT  hand runner, 0 = do not send (default 10000)\n"
         "  -r  UDP command port of the RIGHT hand runner, 0 = do not send (default 10001)\n"
         "  -a  IP address of the runners (default 127.0.0.1)\n"
-        "  -d  directory of the glove calibration files (default calib)\n"
-        "  -n  do not load the calibration files\n"
-        "  -v  verbose: print every message sent\n", prog);
+        "  -d  load glove calibration files from the given directory\n"
+        "  -v  verbose: print outgoing jointpos commands (deg)\n", prog);
 }
 
 bool ParsePort(const char* s, int* out)
@@ -274,17 +272,15 @@ int main(int argc, char** argv)
     side[0].name = 'L'; side[0].port = 10000;
     side[1].name = 'R'; side[1].port = 10001;
     const char* ip = "127.0.0.1";
-    std::string calibDir = "calib";
-    bool skipCalib = false;
+    std::string calibDir;
 
     int opt;
-    while ((opt = getopt(argc, argv, "l:r:a:d:nvh")) != -1) {
+    while ((opt = getopt(argc, argv, "l:r:a:d:vh")) != -1) {
         switch (opt) {
         case 'l': if (!ParsePort(optarg, &side[0].port)) { Usage(argv[0]); return 64; } break;
         case 'r': if (!ParsePort(optarg, &side[1].port)) { Usage(argv[0]); return 64; } break;
         case 'a': ip = optarg; break;
         case 'd': calibDir = optarg; break;
-        case 'n': skipCalib = true; break;
         case 'v': g_verbose = true; break;
         case 'h': Usage(argv[0]); return 0;
         default:  Usage(argv[0]); return 64;
@@ -308,11 +304,11 @@ int main(int argc, char** argv)
     std::signal(SIGTERM, HandleSignal);
 
 #ifdef MANUS_SIM
-    (void)skipCalib;
     std::printf("manus: SIMULATION build, no glove is used\n");
 #else
     if (!InitSdk()) return 2;
-    bool calibDone[2] = {skipCalib, skipCalib};
+    const bool loadCalib = !calibDir.empty();
+    bool calibDone[2] = {!loadCalib, !loadCalib};
     const char* calibFile[2] = {kLeftCalib, kRightCalib};
 #endif
     std::printf("manus: sending at %d Hz, Ctrl-C to stop\n", SEND_HZ);

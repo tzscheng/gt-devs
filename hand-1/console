@@ -2,7 +2,7 @@
 # -*- mode: python -*-
 # Interactive UDP tester for the hand runner (runner.c).
 #
-#   ./runner-test [L2] [-p 10000] [-s 24000] [-a 127.0.0.1]
+#   ./console [L4] [-p 10000] [-s 24000] [-a 127.0.0.1]
 #
 # Top of the screen: latest status of every hand heard on the status port
 # (joint angles in degree, receive rate, age of the last packet), plus the
@@ -115,7 +115,7 @@ class Tester:
                 try: scr.addstr(y, x, s[:W - x - 1].ljust(W - x - 1), attr)
                 except curses.error: pass
 
-        put(0, 0, f' runner-test   cmd -> {self.arg.a}:{self.arg.p}   status <- :{self.arg.s} ', curses.A_REVERSE)
+        put(0, 0, f' console   cmd -> {self.arg.a}:{self.arg.p}   status <- :{self.arg.s} ', curses.A_REVERSE)
         y = 1
         names = self.status.order
         n = self.n_joint()
@@ -208,7 +208,7 @@ class Tester:
                 if k == -1: break
                 if k == curses.KEY_RESIZE: last_draw = 0.0; continue
                 self.key(k); last_draw = 0.0
-            if now - last_draw >= 0.1:
+            if now - last_draw >= 0.05:
                 self.draw(scr, now); last_draw = now
 
 def main():
